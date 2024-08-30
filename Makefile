@@ -188,8 +188,8 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-
-
+	$U/_sleep\
+# Note: Comments cannot be written on the same line
 
 
 ifeq ($(LAB),$(filter $(LAB), lock))

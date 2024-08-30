@@ -190,6 +190,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_sleep\
 	$U/_pingpong\
+	$U/_primes\
 # Note: Comments cannot be written on the same line
 
 

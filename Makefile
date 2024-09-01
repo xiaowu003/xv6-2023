@@ -191,6 +191,7 @@ UPROGS=\
 	$U/_sleep\
 	$U/_pingpong\
 	$U/_primes\
+	$U/_find\
 # Note: Comments cannot be written on the same line
 
 

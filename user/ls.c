@@ -57,6 +57,7 @@ ls(char *path)
     p = buf+strlen(buf);
     *p++ = '/';
     while(read(fd, &de, sizeof(de)) == sizeof(de)){
+      //fprintf(1, "%s : inum = %d\n", de.name, de.inum);  // DEBUG
       if(de.inum == 0)
         continue;
       memmove(p, de.name, DIRSIZ);

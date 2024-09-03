@@ -1,0 +1,6 @@
+1. Function usertrap called syscall.
+2. System call numbers.
+3. Supervisor mode.
+4. lw, s2.
+5. Access addresses outside the kernel
+6. The process name is initcode, pid = 1.

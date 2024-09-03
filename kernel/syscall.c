@@ -101,6 +101,8 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -126,7 +128,80 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_trace]   sys_trace,
+[SYS_sysinfo] sys_sysinfo,
 };
+
+void find_syscall_name(char *name, int num) {
+  switch (num) {
+    case 1:
+      safestrcpy(name, "fork", 20);
+      break;
+    case 2:
+      safestrcpy(name, "exit", 20);
+      break;
+    case 3:
+      safestrcpy(name, "wait", 20);
+      break;
+    case 4:
+      safestrcpy(name, "pipe", 20);
+      break;
+    case 5:
+      safestrcpy(name, "read", 20);
+      break;
+    case 6:
+      safestrcpy(name, "kill", 20);
+      break;
+    case 7:
+      safestrcpy(name, "exec", 20);
+      break;
+    case 8:
+      safestrcpy(name, "fstat", 20);
+      break;
+    case 9:
+      safestrcpy(name, "chdir", 20);
+      break;
+    case 10:
+      safestrcpy(name, "dup", 20);
+      break;
+    case 11:
+      safestrcpy(name, "getpid", 20);
+      break;
+    case 12:
+      safestrcpy(name, "sbrk", 20);
+      break;
+    case 13:
+      safestrcpy(name, "sleep", 20);
+      break;
+    case 14:
+      safestrcpy(name, "uptime", 20);
+      break;
+    case 15:
+      safestrcpy(name, "open", 20);
+      break;
+    case 16:
+      safestrcpy(name, "write", 20);
+      break;
+    case 17:
+      safestrcpy(name, "mknod", 20);
+      break;
+    case 18:
+      safestrcpy(name, "unlink", 20);
+      break;
+    case 19:
+      safestrcpy(name, "link", 20);
+      break;
+    case 20:
+      safestrcpy(name, "mkdir", 20);
+      break;
+    case 21:
+      safestrcpy(name, "close", 20);
+      break;
+    case 22:
+      safestrcpy(name, "trace", 20);
+      break;
+  }
+}
 
 void
 syscall(void)
@@ -135,6 +210,9 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+  
+  //num = *(int*)0;   // lab2-system calls : using gdb
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
@@ -143,5 +221,12 @@ syscall(void)
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);
     p->trapframe->a0 = -1;
+  }
+
+  // lab2-system calls : system call tracing
+  if (((1 << num) & p->mask) == (1 << num)) { 
+    char name[20];
+    find_syscall_name(name, num);
+    printf("%d: syscall %s -> %d\n", p->pid, name, p->trapframe->a0);
   }
 }

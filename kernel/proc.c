@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "sysinfo.h"
 
 struct cpu cpus[NCPU];
 
@@ -145,6 +146,8 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+
+  p->mask = 0;    // lab2-system call : trace
 
   return p;
 }
@@ -321,6 +324,8 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
+
+  np->mask = p->mask;     // lab2-system call : tracing
 
   return pid;
 }
@@ -685,4 +690,21 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// lab2-system calls : sysinfo
+void get_proc_num(struct sysinfo *si) {
+  struct proc *p;
+
+  si->nproc = 0;
+
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state != UNUSED) {
+      si->nproc += 1;
+    }
+    release(&p->lock);
+  }
+  
+  return;
 }

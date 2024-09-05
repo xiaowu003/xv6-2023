@@ -75,6 +75,33 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 va;
+  int pg_num;
+  uint64 buf_addr;
+  uint64 buf = 0;
+  
+  struct proc* p = myproc();
+
+  argaddr(0, &va);  // get the start virtual address
+  argint(1, &pg_num); // get the numver of pages to check
+  argaddr(2, &buf_addr);  // get the user address to a buffer to store the result
+
+  va = PGROUNDDOWN(va);
+  for (int i = 0; i < pg_num; i++) {
+    if ((va + i * PGSIZE) > MAXVA) {
+      return -1;
+    }
+    pte_t* pte = walk(p->pagetable, va + (i * PGSIZE), 0);
+    if (pte == 0) {
+      printf("pte don't exit\n");
+      exit(1);
+    }
+    if (*pte & PTE_A) {
+      buf  = buf | (1L << i);
+    }
+    *pte &= ~PTE_A;
+  }
+  copyout(p->pagetable, buf_addr, (char*)&buf, sizeof(buf));
   return 0;
 }
 #endif
